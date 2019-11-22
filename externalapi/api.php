@@ -1,23 +1,28 @@
-<?php
+<?php 
 $mysqli = new mysqli("localhost", "tylergel", "tylergel", "water-filter-app");
 
 /* check connection */
 if ($mysqli->connect_errno) {
     printf("Connect failed: %s\n", $mysqli->connect_error);
     exit();
+}  
+if(isset($_GET['delete'])) {
+    $sql_delete = "DELETE from pour";
+    $mysqli->query($sql_delete);
+    return true;
 }
-$sql_post = "INSERT INTO temperature (temperature) VALUES ('".$_GET['temperature']."')";
+$sql_post = "INSERT INTO temperature (temperature) VALUES ('".$_GET['temperature']."')"; 
 $mysqli->query($sql_post);
 
-$sql_post = "INSERT INTO quality (quality) VALUES ('".$_GET['quality']."')";
+$sql_post = "INSERT INTO quality (quality) VALUES ('".$_GET['quality']."')"; 
 $mysqli->query($sql_post);
 
-$sql_post = "INSERT INTO level (level) VALUES ('".$_GET['level']."')";
+$sql_post = "INSERT INTO level (level) VALUES ('".$_GET['level']."')"; 
 $mysqli->query($sql_post);
 
 
 
-
+   
 $ansql = "SELECT * from pour";
 $anresult = $mysqli->query($ansql);
 $pour = [];
