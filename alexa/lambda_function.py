@@ -39,6 +39,10 @@ class Database:
     def insertPour(self):
         self.cur.execute("INSERT INTO pour (pour) VALUES ('1')")
         return ""
+    def getAllLevels(self):
+        self.cur.execute("SELECT * FROM level order by id DESC  LIMIT 720")
+        result = self.cur.fetchall()
+        return result
         
 class LaunchRequestHandler(AbstractRequestHandler):
     """Handler for Skill Launch."""
@@ -125,6 +129,32 @@ class GetLevelIntentHandler(AbstractRequestHandler):
         results = Database().getLevels()
         speak_output = "The current water level reading is: "
         speak_output += results['level']
+                
+        return (
+            handler_input.response_builder
+                .speak(speak_output)
+                # .ask("add a reprompt if you want to keep the session open for the user to respond")
+                .response
+        )
+        
+class GetDrankIntentHandler(AbstractRequestHandler):
+    """Handler for Hello World Intent."""
+    def can_handle(self, handler_input):
+        # type: (HandlerInput) -> bool
+        return ask_utils.is_intent_name("GetDrankIntent")(handler_input)
+
+    def handle(self, handler_input):
+        # type: (HandlerInput) -> Response
+        waterlevels = Database().getAllLevels()
+        totalwater = 0
+        for index, water in enumerate(waterlevels) :
+            if index == 0 :
+                continue
+            delta = int(water['level']) - int(waterlevels[index-1]['level'])
+            if delta > 5 :
+                totalwater = totalwater + delta
+        speak_output = "water drank in the past hour is: "
+        speak_output += str(totalwater)
                 
         return (
             handler_input.response_builder
@@ -259,6 +289,7 @@ sb.add_request_handler(GetTemperatureIntentHandler())
 sb.add_request_handler(GetQualityIntentHandler())
 sb.add_request_handler(PourWaterIntentHandler())
 sb.add_request_handler(GetLevelIntentHandler())
+sb.add_request_handler(GetDrankIntentHandler())
 sb.add_request_handler(HelpIntentHandler())
 sb.add_request_handler(CancelOrStopIntentHandler())
 sb.add_request_handler(SessionEndedRequestHandler())
